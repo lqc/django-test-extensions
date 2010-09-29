@@ -114,15 +114,12 @@ class Command(BaseCommand):
         test_options = dict(verbosity=verbosity,
             interactive=interactive)
             
-        test_options["failfast"] = failfast
+        # test_options["failfast"] = failfast
 
         if options.get('coverage'):
             test_options["callgraph"] = callgraph
         
-        try:
-            failures = test_runner(test_labels, **test_options)
-        except TypeError: #Django 1.2
-            failures = test_runner(**test_options).run_tests(test_labels)
+        failures = test_runner(test_labels, **test_options)
         
         if failures:
             sys.exit(failures)
