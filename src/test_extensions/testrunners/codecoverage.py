@@ -65,6 +65,9 @@ def get_all_coverage_modules(app_module):
     """
     # We start off with the imported models.py, so we need to import
     # the parent app package to find the path.
+    if not app_module.__file__:
+        return None
+
     app_path = app_module.__name__.split('.')[:-1]
     app_package = __import__('.'.join(app_path), {}, {}, app_path[-1])
     app_dirpath = app_package.__path__[-1]
@@ -74,13 +77,13 @@ def get_all_coverage_modules(app_module):
         root_path = app_path + root[len(app_dirpath):].split(os.path.sep)[1:]
         excludes = getattr(settings, 'EXCLUDE_FROM_COVERAGE', [])
         if app_path[0] not in excludes:
-            for file in files:
-                if file.lower().endswith('.py'):
-                    mod_name = file[:-3].lower()
+            for f in files:
+                if f.lower().endswith('.py'):
+                    mod_name = f[:-3].lower()
                     try:
                         mod = __import__('.'.join(root_path + [mod_name]),
                             {}, {}, mod_name)
-                    except ImportError:
+                    except (ImportError, TypeError):
                         pass
                     else:
                         mod_list.append(mod)
